@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Camera,
-  Instagram,
   Mail,
   Share2,
   Upload,
@@ -201,7 +200,7 @@ export default function AdminSocialPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-neutral-800 pb-5">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-pink-500/40 bg-pink-500/10 px-3 py-1 font-mono text-[10px] font-bold text-pink-400 mb-2">
-            <Instagram className="h-3 w-3" />
+            <Camera className="h-3 w-3" />
             <span>COMMUNITY & SOCIAL MEDIA STUDIO</span>
           </div>
           <h1 className="font-heading text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
@@ -378,7 +377,7 @@ export default function AdminSocialPage() {
             <div className="rounded-3xl border border-neutral-800 bg-neutral-900/80 p-6 backdrop-blur-xl space-y-5">
               <div>
                 <h3 className="font-heading text-base font-bold uppercase text-white flex items-center gap-2">
-                  <Instagram className="h-4 w-4 text-pink-400" />
+                  <Camera className="h-4 w-4 text-pink-400" />
                   <span>Primary Instagram Account</span>
                 </h3>
                 <p className="font-mono text-xs text-neutral-400 mt-0.5">

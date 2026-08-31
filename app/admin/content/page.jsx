@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { FileText, Save, CheckCircle, Upload, Plus, Trash2, Sparkles, MessageSquare } from "lucide-react";
 
 export default function AdminContentPage() {
