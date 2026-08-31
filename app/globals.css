@@ -1,0 +1,391 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================================
+   FULL-SITE 3D T-SHIRT REACTIVE DESIGN SYSTEM TOKENS
+   ========================================================================= */
+
+:root,
+[data-theme="noir"] {
+  /* Theme 01: NOIR ACID (Param High-Fashion Brutalism) */
+  --theme-id: "noir";
+  --theme-bg: #EFEEE8;
+  --theme-bg-secondary: #D3CCC7;
+  --theme-bg-dark: #000000;
+  --theme-text-primary: #000000;
+  --theme-text-secondary: #555555;
+  --theme-text-inverted: #FFFFFF;
+  --theme-accent: #EF0606;
+  --theme-accent-secondary: #000000;
+  --theme-accent-glow: rgba(239, 6, 6, 0.4);
+  
+  --theme-card-bg: rgba(211, 204, 199, 0.75);
+  --theme-card-bg-hover: rgba(211, 204, 199, 0.95);
+  --theme-card-border: rgba(0, 0, 0, 0.09);
+  --theme-card-border-hover: rgba(239, 6, 6, 0.4);
+  
+  --theme-glass-surface: rgba(239, 238, 232, 0.92);
+  --theme-glass-dark: rgba(0, 0, 0, 0.92);
+  --theme-glass-border: rgba(0, 0, 0, 0.1);
+  --theme-badge-bg: rgba(239, 6, 6, 0.12);
+  --theme-badge-text: #EF0606;
+  --theme-badge-border: rgba(239, 6, 6, 0.3);
+  
+  --theme-btn-primary-bg: #EF0606;
+  --theme-btn-primary-text: #FFFFFF;
+  --theme-btn-primary-hover: #D00404;
+
+  --theme-font-heading: var(--font-bodoni), 'Bodoni Moda', 'Cinzel', serif;
+  --theme-font-body: var(--font-montserrat), 'Montserrat', sans-serif;
+  --theme-font-tag: var(--font-montserrat), 'Montserrat', sans-serif;
+
+  --theme-grid-pattern: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  --theme-glow-color: #EF0606;
+}
+
+[data-theme="cyber"] {
+  /* Theme 02: CYBER KINETIC (Neo-Tokyo High-Velocity Telemetry) */
+  --theme-id: "cyber";
+  --theme-bg: #080B10;
+  --theme-bg-secondary: #0D121C;
+  --theme-bg-dark: #040609;
+  --theme-text-primary: #F0F6FC;
+  --theme-text-secondary: #8B949E;
+  --theme-text-inverted: #000000;
+  --theme-accent: #CCFF00;
+  --theme-accent-secondary: #00F0FF;
+  --theme-accent-glow: rgba(204, 255, 0, 0.55);
+  
+  --theme-card-bg: rgba(13, 18, 28, 0.85);
+  --theme-card-bg-hover: rgba(18, 26, 40, 0.95);
+  --theme-card-border: rgba(204, 255, 0, 0.25);
+  --theme-card-border-hover: rgba(204, 255, 0, 0.65);
+  
+  --theme-glass-surface: rgba(13, 18, 28, 0.92);
+  --theme-glass-dark: rgba(4, 6, 9, 0.94);
+  --theme-glass-border: rgba(204, 255, 0, 0.25);
+  --theme-badge-bg: rgba(204, 255, 0, 0.15);
+  --theme-badge-text: #CCFF00;
+  --theme-badge-border: rgba(204, 255, 0, 0.4);
+  
+  --theme-btn-primary-bg: #CCFF00;
+  --theme-btn-primary-text: #000000;
+  --theme-btn-primary-hover: #b8e600;
+
+  --theme-font-heading: var(--font-mono), 'JetBrains Mono', 'Space Mono', monospace;
+  --theme-font-body: var(--font-mono), 'JetBrains Mono', monospace;
+  --theme-font-tag: var(--font-mono), 'JetBrains Mono', monospace;
+
+  --theme-grid-pattern: linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  --theme-glow-color: #00F0FF;
+}
+
+[data-theme="ragnarok"] {
+  /* Theme 03: GOTHIC RAGNAROK (Scorched Norse Metalcore Relic) */
+  --theme-id: "ragnarok";
+  --theme-bg: #100C0C;
+  --theme-bg-secondary: #191212;
+  --theme-bg-dark: #0A0707;
+  --theme-text-primary: #FEF3C7;
+  --theme-text-secondary: #A8A29E;
+  --theme-text-inverted: #000000;
+  --theme-accent: #F59E0B;
+  --theme-accent-secondary: #DC2626;
+  --theme-accent-glow: rgba(245, 158, 11, 0.55);
+  
+  --theme-card-bg: rgba(25, 18, 18, 0.88);
+  --theme-card-bg-hover: rgba(35, 24, 24, 0.96);
+  --theme-card-border: rgba(245, 158, 11, 0.28);
+  --theme-card-border-hover: rgba(245, 158, 11, 0.65);
+  
+  --theme-glass-surface: rgba(25, 18, 18, 0.94);
+  --theme-glass-dark: rgba(10, 7, 7, 0.95);
+  --theme-glass-border: rgba(245, 158, 11, 0.25);
+  --theme-badge-bg: rgba(245, 158, 11, 0.18);
+  --theme-badge-text: #F59E0B;
+  --theme-badge-border: rgba(245, 158, 11, 0.45);
+  
+  --theme-btn-primary-bg: #F59E0B;
+  --theme-btn-primary-text: #000000;
+  --theme-btn-primary-hover: #D97706;
+
+  --theme-font-heading: var(--font-bodoni), 'Cinzel', 'Playfair Display', serif;
+  --theme-font-body: var(--font-montserrat), 'Montserrat', serif;
+  --theme-font-tag: var(--font-bodoni), 'Cinzel', serif;
+
+  --theme-grid-pattern: radial-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px);
+  --theme-glow-color: #F59E0B;
+}
+
+/* =========================================================================
+   CORE HTML & BODY STYLES
+   ========================================================================= */
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--theme-bg);
+  color: var(--theme-text-primary);
+  font-family: var(--theme-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+::selection {
+  background: var(--theme-accent);
+  color: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-accent);
+}
+
+/* Hide scrollbar for clean horizontal gallery rows */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Dynamic Studio & Cyber Grid Backgrounds */
+.bg-theme-grid {
+  background-image: var(--theme-grid-pattern);
+  background-size: 24px 24px;
+}
+
+/* Marquee infinite scroll animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marquee 22s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Shimmer Button Accent Effect */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 80%
+  );
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.75s ease;
+}
+
+.btn-shimmer:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+/* =========================================================================
+   DYNAMIC THEME TYPOGRAPHY & UTILITY CLASSES
+   ========================================================================= */
+
+.font-theme-heading {
+  font-family: var(--theme-font-heading);
+}
+
+.font-theme-body {
+  font-family: var(--theme-font-body);
+}
+
+.font-theme-tag {
+  font-family: var(--theme-font-tag);
+}
+
+/* 1. Blackletter / Old English */
+.font-stay,
+.font-blackletter,
+.font-oldenglish {
+  font-family: var(--font-stay), "UnifrakturCook", serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* 2. Didone Serif */
+.font-focused,
+.font-didone,
+.font-bodoni {
+  font-family: var(--font-bodoni), "Bodoni Moda", serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+/* 3. Geometric Sans-Serif */
+.font-geometric,
+.font-montserrat {
+  font-family: var(--font-montserrat), "Montserrat", sans-serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* 4. Display Typography */
+.font-display {
+  font-family: var(--font-display), "Archivo Black", sans-serif;
+}
+
+/* 5. Monospace Typography */
+.font-mono {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+}
+
+/* =========================================================================
+   REACTIVE THEMED GLASS SURFACES & BUTTONS
+   ========================================================================= */
+
+/* Adaptive Themed Card */
+.glass-theme-card {
+  background-color: var(--theme-card-bg);
+  border: 1px solid var(--theme-card-border);
+  color: var(--theme-text-primary);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+}
+
+.glass-theme-card:hover {
+  background-color: var(--theme-card-bg-hover);
+  border-color: var(--theme-card-border-hover);
+  box-shadow: 0 20px 45px -8px var(--theme-accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-3px) translateZ(0);
+}
+
+/* Adaptive Themed Surface */
+.glass-theme-surface {
+  background: var(--theme-glass-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-glass-border);
+  color: var(--theme-text-primary);
+  box-shadow: 0 16px 44px -8px rgba(0, 0, 0, 0.25);
+  transition: all 0.4s ease;
+}
+
+/* Adaptive Themed Badge */
+.glass-theme-badge {
+  background: var(--theme-badge-bg);
+  border: 1px solid var(--theme-badge-border);
+  color: var(--theme-badge-text);
+  box-shadow: 0 2px 10px var(--theme-badge-bg);
+  transition: all 0.3s ease;
+}
+
+/* Adaptive Themed Primary Action Button */
+.btn-theme-primary {
+  background-color: var(--theme-btn-primary-bg);
+  color: var(--theme-btn-primary-text);
+  border: 1px solid var(--theme-glass-border);
+  box-shadow: 0 8px 24px -4px var(--theme-accent-glow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--theme-font-tag);
+}
+
+.btn-theme-primary:hover {
+  background-color: var(--theme-btn-primary-hover);
+  box-shadow: 0 12px 30px -2px var(--theme-accent-glow);
+  transform: translateY(-2px);
+}
+
+.btn-theme-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Adaptive Themed Pill / Filter */
+.pill-theme-filter {
+  background: var(--theme-badge-bg);
+  border: 1px solid var(--theme-badge-border);
+  color: var(--theme-text-primary);
+  transition: all 0.2s ease;
+}
+
+.pill-theme-filter:hover,
+.pill-theme-filter.active {
+  background: var(--theme-accent);
+  color: var(--theme-btn-primary-text);
+  border-color: var(--theme-accent);
+  box-shadow: 0 4px 14px var(--theme-accent-glow);
+}
+
+/* Hardware accelerated transform utility */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Content visibility optimization for smooth 60fps scrolling */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
