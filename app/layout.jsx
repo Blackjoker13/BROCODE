@@ -52,9 +52,9 @@ export const metadata = {
   description:
     "Luxury oversized streetwear. Brocode Param Collection live now. 3D interactive preview.",
   icons: {
-    icon: "/icon 2.svg",
-    shortcut: "/icon 2.svg",
-    apple: "/icon 2.svg",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 

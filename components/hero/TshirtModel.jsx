@@ -200,7 +200,19 @@ export default function TshirtModel({
   );
 }
 
-// Preload all 3 models with Draco decoder support
-Object.values(MODEL_CONFIGS).forEach((cfg) => {
-  useGLTF.preload(cfg.url, DRACO_PATH);
-});
+// Prioritize primary active model preloading immediately
+if (typeof window !== "undefined") {
+  useGLTF.preload(MODEL_CONFIGS.noir.url, DRACO_PATH);
+
+  // Defer secondary theme models until idle to ensure initial hero renders instantly (<1s)
+  const deferSecondaryPreload = () => {
+    useGLTF.preload(MODEL_CONFIGS.cyber.url, DRACO_PATH);
+    useGLTF.preload(MODEL_CONFIGS.ragnarok.url, DRACO_PATH);
+  };
+
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(deferSecondaryPreload, { timeout: 2500 });
+  } else {
+    setTimeout(deferSecondaryPreload, 2000);
+  }
+}
