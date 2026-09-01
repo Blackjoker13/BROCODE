@@ -278,11 +278,6 @@ export default function HeroSection() {
     setCurrencyIdx((i) => (i + 1) % CURRENCIES.length);
   };
 
-  const formattedPrice =
-    activeCurrency.symbol === "₹"
-      ? `₹${Math.round(activeVariation.price * activeCurrency.rate).toLocaleString("en-IN")}`
-      : `${activeCurrency.symbol}${(activeVariation.price * activeCurrency.rate).toFixed(2)}`;
-
   return (
     <div
       ref={heroRef}
@@ -484,8 +479,8 @@ export default function HeroSection() {
                   <span className="text-[9px] font-bold uppercase tracking-wider opacity-60 block">
                     {activeVariation.collection}
                   </span>
-                  <div className="text-xl font-black font-didone uppercase leading-tight mt-0.5">
-                    {formattedPrice}
+                  <div className="text-sm sm:text-base font-black font-didone uppercase tracking-wider leading-tight mt-0.5">
+                    {activeVariation.shortTitle}
                   </div>
                 </div>
 
