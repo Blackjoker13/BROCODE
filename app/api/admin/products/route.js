@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function GET(request) {
   try {
@@ -74,64 +75,72 @@ export async function POST(request) {
     const data = await request.json();
     const {
       title,
+      description,
       price,
       compareAtPrice,
-      costPerItem,
+      costPrice,
       sku,
+      barcode,
       stock = 0,
-      categoryId,
-      description,
+      lowStockThreshold = 5,
+      status = "ACTIVE",
+      featured = false,
+      is3DEnabled = true,
+      model3dUrl = "/tshirt.glb",
       images = [],
       colors = [],
-      sizes = ["S", "M", "L", "XL"],
+      sizes = [],
       badges = [],
       tags = [],
-      isFeatured = false,
-      isTrending = false,
-      isNewArrival = true,
-      isLimited = false,
-      status = "ACTIVE",
+      categoryId,
+      metaTitle,
+      metaDescription,
     } = data;
 
-    if (!title || price === undefined) {
+    if (!title || price === undefined || price === null) {
       return NextResponse.json(
         { error: "Title and price are required" },
         { status: 400 }
       );
     }
 
-    // Auto-generate unique slug
-    let baseSlug = title
+    const cleanTitle = title.trim();
+    let slug = cleanTitle
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-    let slug = baseSlug;
-    let count = 1;
-    while (await db.product.findUnique({ where: { slug } })) {
-      slug = `${baseSlug}-${count++}`;
+
+    if (!slug) slug = `prod-${Date.now()}`;
+
+    // Ensure unique slug
+    const existing = await db.product.findUnique({ where: { slug } });
+    if (existing) {
+      slug = `${slug}-${Math.random().toString(36).substring(2, 6)}`;
     }
 
     const product = await db.product.create({
       data: {
-        title,
+        title: cleanTitle,
         slug,
         description: description || "",
-        price: parseFloat(price),
+        price: parseFloat(price) || 0,
         compareAtPrice: compareAtPrice ? parseFloat(compareAtPrice) : null,
-        costPerItem: costPerItem ? parseFloat(costPerItem) : null,
-        sku: sku || `BRO-${Math.floor(1000 + Math.random() * 9000)}`,
+        costPrice: costPrice ? parseFloat(costPrice) : null,
+        sku: sku || `BC-${Date.now().toString(36).toUpperCase()}`,
+        barcode: barcode || null,
         stock: parseInt(stock) || 0,
-        isOutOfStock: parseInt(stock) <= 0,
-        isFeatured: Boolean(isFeatured),
-        isTrending: Boolean(isTrending),
-        isNewArrival: Boolean(isNewArrival),
-        isLimited: Boolean(isLimited),
-        status: status || "ACTIVE",
-        images: JSON.stringify(images),
-        colors: JSON.stringify(colors),
-        sizes: JSON.stringify(sizes),
-        badges: JSON.stringify(badges),
-        tags: JSON.stringify(tags),
+        lowStockThreshold: parseInt(lowStockThreshold) || 5,
+        status,
+        featured: Boolean(featured),
+        is3DEnabled: Boolean(is3DEnabled),
+        model3dUrl: model3dUrl || "/tshirt.glb",
+        metaTitle: metaTitle || cleanTitle,
+        metaDescription: metaDescription || description || "",
+        images: typeof images === "string" ? images : JSON.stringify(images),
+        colors: typeof colors === "string" ? colors : JSON.stringify(colors),
+        sizes: typeof sizes === "string" ? sizes : JSON.stringify(sizes),
+        badges: typeof badges === "string" ? badges : JSON.stringify(badges),
+        tags: typeof tags === "string" ? tags : JSON.stringify(tags),
         categoryId: categoryId || null,
       },
       include: {
@@ -141,27 +150,29 @@ export async function POST(request) {
 
     // Update category item count
     if (categoryId) {
-      const totalInCat = await db.product.count({ where: { categoryId } });
-      await db.category.update({
-        where: { id: categoryId },
-        data: { itemCount: totalInCat },
-      });
+      try {
+        const totalInCat = await db.product.count({ where: { categoryId } });
+        await db.category.update({
+          where: { id: categoryId },
+          data: { itemCount: totalInCat },
+        });
+      } catch (_) {}
     }
 
-    // Log Activity
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "PRODUCT_CREATED",
-        entity: "Product",
-        entityId: product.id,
-        details: `Created product "${product.title}" ($${product.price}).`,
-      },
+    // Log Activity safely
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "PRODUCT_CREATED",
+      entity: "Product",
+      entityId: product.id,
+      details: `Created product "${product.title}" ($${product.price}).`,
     });
 
     // Invalidate storefront catalog cache
-    const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
-    invalidateStorefrontCache();
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, product });
   } catch (err) {

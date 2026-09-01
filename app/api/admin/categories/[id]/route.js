@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function PUT(request, { params }) {
   const admin = await getAdminSession();
@@ -15,7 +16,11 @@ export async function PUT(request, { params }) {
     const updateData = {};
     if (data.name) {
       updateData.name = data.name.toUpperCase().trim();
-      updateData.slug = data.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+      updateData.slug = data.name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     }
     if (data.description !== undefined) updateData.description = data.description;
     if (data.image !== undefined) updateData.image = data.image;
@@ -28,22 +33,23 @@ export async function PUT(request, { params }) {
       data: updateData,
     });
 
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "CATEGORY_UPDATED",
-        entity: "Category",
-        entityId: updated.id,
-        details: `Updated category "${updated.name}".`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "CATEGORY_UPDATED",
+      entity: "Category",
+      entityId: updated.id,
+      details: `Updated category "${updated.name}".`,
     });
 
     // Invalidate storefront catalog cache
-    const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
-    invalidateStorefrontCache();
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, category: updated });
   } catch (err) {
+    console.error("Update category error:", err);
     return NextResponse.json(
       { error: "Failed to update category: " + err.message },
       { status: 500 }
@@ -66,22 +72,23 @@ export async function DELETE(request, { params }) {
 
     await db.category.delete({ where: { id } });
 
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "CATEGORY_DELETED",
-        entity: "Category",
-        entityId: id,
-        details: `Deleted category "${category.name}".`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "CATEGORY_DELETED",
+      entity: "Category",
+      entityId: id,
+      details: `Deleted category "${category.name}".`,
     });
 
     // Invalidate storefront catalog cache
-    const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
-    invalidateStorefrontCache();
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, message: "Category deleted successfully" });
   } catch (err) {
+    console.error("Delete category error:", err);
     return NextResponse.json(
       { error: "Failed to delete category: " + err.message },
       { status: 500 }

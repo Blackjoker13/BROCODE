@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function GET(request, { params }) {
   try {
@@ -37,69 +38,80 @@ export async function PUT(request, { params }) {
     const { id } = params;
     const data = await request.json();
 
-    const existing = await db.product.findUnique({ where: { id } });
-    if (!existing) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    const updateData = {};
+
+    const stringFields = ["title", "description", "sku", "barcode", "status", "model3dUrl", "metaTitle", "metaDescription", "categoryId"];
+    stringFields.forEach((field) => {
+      if (data[field] !== undefined) updateData[field] = data[field];
+    });
+
+    if (data.title) {
+      updateData.title = data.title.trim();
+      updateData.slug = data.title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     }
 
-    const updateData = {};
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.price !== undefined) updateData.price = parseFloat(data.price);
-    if (data.compareAtPrice !== undefined)
+    if (data.price !== undefined) updateData.price = parseFloat(data.price) || 0;
+    if (data.compareAtPrice !== undefined) {
       updateData.compareAtPrice = data.compareAtPrice ? parseFloat(data.compareAtPrice) : null;
-    if (data.costPerItem !== undefined)
-      updateData.costPerItem = data.costPerItem ? parseFloat(data.costPerItem) : null;
-    if (data.sku !== undefined) updateData.sku = data.sku;
-    if (data.stock !== undefined) {
-      const s = parseInt(data.stock) || 0;
-      updateData.stock = s;
-      updateData.isOutOfStock = s <= 0;
     }
-    if (data.categoryId !== undefined) updateData.categoryId = data.categoryId || null;
-    if (data.isFeatured !== undefined) updateData.isFeatured = Boolean(data.isFeatured);
-    if (data.isTrending !== undefined) updateData.isTrending = Boolean(data.isTrending);
-    if (data.isNewArrival !== undefined) updateData.isNewArrival = Boolean(data.isNewArrival);
-    if (data.isLimited !== undefined) updateData.isLimited = Boolean(data.isLimited);
-    if (data.status !== undefined) updateData.status = data.status;
-    if (data.images !== undefined) updateData.images = JSON.stringify(data.images);
-    if (data.colors !== undefined) updateData.colors = JSON.stringify(data.colors);
-    if (data.sizes !== undefined) updateData.sizes = JSON.stringify(data.sizes);
-    if (data.badges !== undefined) updateData.badges = JSON.stringify(data.badges);
-    if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
+    if (data.costPrice !== undefined) {
+      updateData.costPrice = data.costPrice ? parseFloat(data.costPrice) : null;
+    }
+    if (data.stock !== undefined) updateData.stock = parseInt(data.stock) || 0;
+    if (data.lowStockThreshold !== undefined) {
+      updateData.lowStockThreshold = parseInt(data.lowStockThreshold) || 5;
+    }
+
+    if (data.featured !== undefined) updateData.featured = Boolean(data.featured);
+    if (data.is3DEnabled !== undefined) updateData.is3DEnabled = Boolean(data.is3DEnabled);
+
+    const jsonFields = ["images", "colors", "sizes", "badges", "tags"];
+    jsonFields.forEach((field) => {
+      if (data[field] !== undefined) {
+        updateData[field] = typeof data[field] === "string" ? data[field] : JSON.stringify(data[field]);
+      }
+    });
 
     const updated = await db.product.update({
       where: { id },
       data: updateData,
-      include: { category: true },
-    });
-
-    // Check for Low Stock notification
-    if (updated.stock <= (updated.lowStockAlert || 5)) {
-      await db.notification.create({
-        data: {
-          type: "LOW_STOCK",
-          title: `Low Stock: "${updated.title}"`,
-          message: `Stock level dropped to ${updated.stock} units.`,
-          link: `/admin/inventory`,
-        },
-      });
-    }
-
-    // Log Activity
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "PRODUCT_UPDATED",
-        entity: "Product",
-        entityId: updated.id,
-        details: `Updated product "${updated.title}".`,
+      include: {
+        category: true,
       },
     });
 
+    // Check for low stock notification
+    if (updated.stock <= updated.lowStockThreshold) {
+      try {
+        await db.notification.create({
+          data: {
+            type: "LOW_STOCK",
+            title: `Low Stock: "${updated.title}"`,
+            message: `Stock level dropped to ${updated.stock} units.`,
+            link: `/admin/inventory`,
+          },
+        });
+      } catch (_) {}
+    }
+
+    // Log Activity safely
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "PRODUCT_UPDATED",
+      entity: "Product",
+      entityId: updated.id,
+      details: `Updated product "${updated.title}".`,
+    });
+
     // Invalidate storefront catalog cache
-    const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
-    invalidateStorefrontCache();
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, product: updated });
   } catch (err) {
@@ -128,28 +140,30 @@ export async function DELETE(request, { params }) {
 
     // Update category count
     if (existing.categoryId) {
-      const count = await db.product.count({
-        where: { categoryId: existing.categoryId },
-      });
-      await db.category.update({
-        where: { id: existing.categoryId },
-        data: { itemCount: count },
-      });
+      try {
+        const count = await db.product.count({
+          where: { categoryId: existing.categoryId },
+        });
+        await db.category.update({
+          where: { id: existing.categoryId },
+          data: { itemCount: count },
+        });
+      } catch (_) {}
     }
 
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "PRODUCT_DELETED",
-        entity: "Product",
-        entityId: id,
-        details: `Deleted product "${existing.title}".`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "PRODUCT_DELETED",
+      entity: "Product",
+      entityId: id,
+      details: `Deleted product "${existing.title}".`,
     });
 
     // Invalidate storefront catalog cache
-    const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
-    invalidateStorefrontCache();
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, message: "Product deleted successfully" });
   } catch (err) {

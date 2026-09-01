@@ -192,6 +192,16 @@ export default function AdminProductsPage() {
         throw new Error(data.error || "Save failed");
       }
 
+      if (data.product) {
+        setProducts((prev) => {
+          const exists = prev.some((p) => p.id === data.product.id);
+          if (exists) {
+            return prev.map((p) => (p.id === data.product.id ? data.product : p));
+          }
+          return [data.product, ...prev];
+        });
+      }
+
       setModalOpen(false);
       fetchProducts();
     } catch (err) {

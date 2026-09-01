@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
 import { safeJsonParse } from "@/lib/utils";
 import { invalidateStorefrontCache } from "@/lib/cache/storefrontCache";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function GET() {
   try {
@@ -59,16 +60,16 @@ export async function PUT(request) {
     });
 
     // Invalidate in-memory storefront cache so changes are immediately live on customer side
-    invalidateStorefrontCache();
+    try {
+      invalidateStorefrontCache();
+    } catch (_) {}
 
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "CONTENT_UPDATED",
-        entity: "WebContent",
-        entityId: updated.id,
-        details: `Updated CMS section "${sectionKey}".`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "CONTENT_UPDATED",
+      entity: "WebContent",
+      entityId: updated.id,
+      details: `Updated CMS section "${sectionKey}".`,
     });
 
     return NextResponse.json({ success: true, content: updated });

@@ -105,6 +105,16 @@ export default function AdminCategoriesPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
 
+      if (data.category) {
+        setCategories((prev) => {
+          const exists = prev.some((c) => c.id === data.category.id);
+          if (exists) {
+            return prev.map((c) => (c.id === data.category.id ? data.category : c));
+          }
+          return [data.category, ...prev];
+        });
+      }
+
       setModalOpen(false);
       fetchCategories();
     } catch (err) {

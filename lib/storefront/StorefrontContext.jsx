@@ -79,17 +79,15 @@ export function StorefrontProvider({ children, initialData }) {
   }, [initialData]);
 
   useEffect(() => {
-    // Only fetch client-side if initial server data was not provided
-    if (!initialData || !initialData.products || initialData.products.length === 0) {
-      refreshData();
-    }
+    // Always refresh real-time data in background so admin edits appear instantly
+    refreshData();
 
     // Load persisted cart from localStorage
     try {
       const saved = localStorage.getItem("brocode_cart");
       if (saved) setCart(JSON.parse(saved));
     } catch (e) {}
-  }, [initialData, refreshData]);
+  }, [refreshData]);
 
   const saveCart = (newCart) => {
     setCart(newCart);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
-import { invalidateStorefrontCache } from "@/lib/cache/storefrontCache";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function GET() {
   try {
@@ -58,18 +58,19 @@ export async function POST(request) {
       },
     });
 
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "BANNER_CREATED",
-        entity: "Banner",
-        entityId: banner.id,
-        details: `Created banner "${banner.title}" (${banner.placement}).`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "BANNER_CREATED",
+      entity: "Banner",
+      entityId: banner.id,
+      details: `Created banner "${banner.title}" (${banner.placement}).`,
     });
 
     // Invalidate storefront cache
-    invalidateStorefrontCache();
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, banner });
   } catch (err) {

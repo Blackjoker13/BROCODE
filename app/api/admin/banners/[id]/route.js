@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
-import { invalidateStorefrontCache } from "@/lib/cache/storefrontCache";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function PUT(request, { params }) {
   const admin = await getAdminSession();
@@ -29,18 +29,19 @@ export async function PUT(request, { params }) {
       data: updateData,
     });
 
-    // Invalidate cache immediately
-    invalidateStorefrontCache();
-
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "BANNER_UPDATED",
-        entity: "Banner",
-        entityId: updated.id,
-        details: `Updated banner "${updated.title}".`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "BANNER_UPDATED",
+      entity: "Banner",
+      entityId: updated.id,
+      details: `Updated banner "${updated.title}".`,
     });
+
+    // Invalidate storefront cache
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, banner: updated });
   } catch (err) {
@@ -59,20 +60,26 @@ export async function DELETE(request, { params }) {
 
   try {
     const { id } = params;
+    const banner = await db.banner.findUnique({ where: { id } });
+    if (!banner) {
+      return NextResponse.json({ error: "Banner not found" }, { status: 404 });
+    }
+
     await db.banner.delete({ where: { id } });
 
-    // Invalidate cache immediately
-    invalidateStorefrontCache();
-
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "BANNER_DELETED",
-        entity: "Banner",
-        entityId: id,
-        details: `Deleted banner ID ${id}.`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "BANNER_DELETED",
+      entity: "Banner",
+      entityId: id,
+      details: `Deleted banner "${banner.title}".`,
     });
+
+    // Invalidate storefront cache
+    try {
+      const { invalidateStorefrontCache } = await import("@/lib/cache/storefrontCache");
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, message: "Banner deleted successfully" });
   } catch (err) {

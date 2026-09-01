@@ -117,9 +117,21 @@ export default function AdminBannersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      const data = await res.json();
       if (res.ok) {
+        if (data.banner) {
+          setBanners((prev) => {
+            const exists = prev.some((b) => b.id === data.banner.id);
+            if (exists) {
+              return prev.map((b) => (b.id === data.banner.id ? data.banner : b));
+            }
+            return [data.banner, ...prev];
+          });
+        }
         setModalOpen(false);
         fetchBanners();
+      } else {
+        alert(data.error || "Failed to save banner");
       }
     } catch (e) {
       alert("Failed to save banner");

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir, readFile } from "fs/promises";
-import fs from "fs";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { getAdminSession } from "@/lib/auth/adminAuth";
 import sharp from "sharp";
@@ -13,29 +12,26 @@ export async function POST(request) {
 
   try {
     const data = await request.formData();
-    const files = data.getAll("files");
+    let files = data.getAll("files");
 
     if (!files || files.length === 0) {
       const single = data.get("file");
       if (single) {
-        files.push(single);
+        files = [single];
       }
     }
 
-    if (files.length === 0) {
+    if (!files || files.length === 0) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
     }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    const manifestPath = path.join(process.cwd(), "public", "assets-manifest.json");
-    let manifest = {};
+    let isDiskWritable = true;
     try {
-      if (fs.existsSync(manifestPath)) {
-        manifest = JSON.parse(await readFile(manifestPath, "utf-8"));
-      }
-    } catch (e) {}
+      await mkdir(uploadDir, { recursive: true });
+    } catch (e) {
+      isDiskWritable = false;
+    }
 
     const uploadedUrls = [];
 
@@ -45,6 +41,7 @@ export async function POST(request) {
       const buffer = Buffer.from(bytes);
 
       const ext = (path.extname(file.name) || ".jpg").toLowerCase();
+      const mimeType = file.type || (ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg");
       const cleanName = path
         .basename(file.name, ext)
         .replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -52,71 +49,47 @@ export async function POST(request) {
         .toString(36)
         .substring(2, 7)}`;
       const filename = `${baseFilename}${ext}`;
-      const filePath = path.join(uploadDir, filename);
 
-      await writeFile(filePath, buffer);
-      const publicUrl = `/uploads/${filename}`;
-      uploadedUrls.push(publicUrl);
-
-      // Auto-Optimize Images on Upload
-      if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
+      if (isDiskWritable) {
         try {
-          const meta = await sharp(buffer).metadata();
-          const webpFilename = `${baseFilename}.webp`;
-          const avifFilename = `${baseFilename}.avif`;
+          const filePath = path.join(uploadDir, filename);
+          await writeFile(filePath, buffer);
+          uploadedUrls.push(`/uploads/${filename}`);
 
-          // Generate full WebP & AVIF
-          await sharp(buffer)
-            .webp({ quality: 85, effort: 5 })
-            .toFile(path.join(uploadDir, webpFilename));
-          await sharp(buffer)
-            .avif({ quality: 75, effort: 4 })
-            .toFile(path.join(uploadDir, avifFilename));
-
-          // Generate responsive sizes (320, 640, 1024)
-          const respWebpVariants = { full: `/uploads/${webpFilename}` };
-          for (const width of [320, 640, 1024]) {
-            if (meta.width && meta.width >= width) {
-              const respName = `${baseFilename}_${width}w.webp`;
+          // Try Sharp optimization on disk if supported
+          if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
+            try {
+              const webpFilename = `${baseFilename}.webp`;
               await sharp(buffer)
-                .resize(width, null, { withoutEnlargement: true })
-                .webp({ quality: 82 })
-                .toFile(path.join(uploadDir, respName));
-              respWebpVariants[width] = `/uploads/${respName}`;
-            }
+                .webp({ quality: 85 })
+                .toFile(path.join(uploadDir, webpFilename));
+            } catch (_) {}
           }
-
-          // Generate LQIP
-          const lqip = await sharp(buffer)
-            .resize(16, Math.round(16 * ((meta.height || 16) / (meta.width || 16))), { fit: "inside" })
-            .webp({ quality: 20 })
-            .toBuffer();
-
-          const entry = {
-            original: publicUrl,
-            width: meta.width,
-            height: meta.height,
-            aspectRatio: ((meta.width || 1) / (meta.height || 1)).toFixed(3),
-            format: meta.format,
-            variants: {
-              webp: respWebpVariants,
-              avif: { full: `/uploads/${avifFilename}` },
-            },
-            blurDataURL: `data:image/webp;base64,${lqip.toString("base64")}`,
-          };
-
-          manifest[publicUrl] = entry;
-          manifest[filename] = entry;
-        } catch (imgErr) {
-          console.warn("[Upload Auto-Optimize Image Error]:", imgErr.message);
+          continue;
+        } catch (writeErr) {
+          isDiskWritable = false;
         }
       }
-    }
 
-    // Save updated manifest asynchronously
-    try {
-      await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
-    } catch (mErr) {}
+      // Vercel Serverless / Read-Only Fallback: Convert to optimized WebP Data URI
+      try {
+        if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
+          const webpBuffer = await sharp(buffer)
+            .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
+            .webp({ quality: 85 })
+            .toBuffer();
+          const dataUri = `data:image/webp;base64,${webpBuffer.toString("base64")}`;
+          uploadedUrls.push(dataUri);
+        } else {
+          // Audio or other assets -> standard base64 data URI
+          const dataUri = `data:${mimeType};base64,${buffer.toString("base64")}`;
+          uploadedUrls.push(dataUri);
+        }
+      } catch (sharpErr) {
+        const dataUri = `data:${mimeType};base64,${buffer.toString("base64")}`;
+        uploadedUrls.push(dataUri);
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -124,7 +97,7 @@ export async function POST(request) {
       url: uploadedUrls[0] || null,
     });
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error("Upload handler error:", err);
     return NextResponse.json(
       { error: "Image upload failed: " + err.message },
       { status: 500 }

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth/adminAuth";
 import { safeJsonParse } from "@/lib/utils";
 import { invalidateStorefrontCache } from "@/lib/cache/storefrontCache";
+import { safeLogActivity } from "@/lib/dbSafe";
 
 export async function GET() {
   try {
@@ -43,17 +44,17 @@ export async function PUT(request) {
       });
     }
 
-    await db.activityLog.create({
-      data: {
-        adminId: admin.id,
-        action: "SETTINGS_UPDATED",
-        entity: "Setting",
-        details: `Updated store configuration settings.`,
-      },
+    await safeLogActivity({
+      adminId: admin.id,
+      action: "SETTINGS_UPDATED",
+      entity: "Setting",
+      details: `Updated store configuration settings.`,
     });
 
     // Invalidate storefront memory cache for instant customer updates
-    invalidateStorefrontCache();
+    try {
+      invalidateStorefrontCache();
+    } catch (_) {}
 
     return NextResponse.json({ success: true, message: "Settings saved successfully" });
   } catch (err) {
