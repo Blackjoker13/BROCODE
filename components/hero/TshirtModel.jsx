@@ -94,6 +94,7 @@ export default function TshirtModel({
   rotateSpeed = 0.65,
   targetAngle = null,
   userInteracting = false,
+  scaleMultiplier = 1.0,
   ...props
 }) {
   const outerGroup = useRef();
@@ -147,7 +148,7 @@ export default function TshirtModel({
         modelUrl={modelInfo.url}
         dracoPath={modelInfo.dracoPath}
         isAnimated={modelInfo.isAnimated}
-        targetHeight={modelInfo.scale}
+        targetHeight={modelInfo.scale * scaleMultiplier}
         tier={tier}
         isLowPower={isLowPower}
         gl={gl}

@@ -69,6 +69,7 @@ export default function Scene({
   autoRotate = true,
   rotateSpeed = 0.7,
   targetAngle = null,
+  isMobileView = false,
 }) {
   const { isHeroVisible, tier, isLowPower } = usePerformance();
   const controlsRef = useRef();
@@ -109,11 +110,11 @@ export default function Scene({
     if (isLowPower || tier === "low") {
       return Math.min(deviceDPR, 0.9);
     }
-    if (isMobile || tier === "medium") {
+    if (isMobile || isMobileView || tier === "medium") {
       return Math.min(deviceDPR, 1.05);
     }
     return Math.min(deviceDPR, 1.2);
-  }, [tier, isLowPower]);
+  }, [tier, isLowPower, isMobileView]);
 
   const shadowRes = useMemo(() => {
     return isLowPower || tier === "low" ? 128 : 256;
@@ -122,11 +123,13 @@ export default function Scene({
   const shouldRender = isHeroVisible && isTabVisible;
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const isMobileOptimized = isMobileView || isMobile;
+
   const cameraConfig = useMemo(() => {
-    return isMobile
-      ? { position: [0, 0.08, 4.9], fov: 34, near: 0.1, far: 30 }
+    return isMobileOptimized
+      ? { position: [0, 0.06, 4.05], fov: 35, near: 0.1, far: 30 }
       : { position: [0, 0.12, 4.5], fov: 32, near: 0.1, far: 30 };
-  }, [isMobile]);
+  }, [isMobileOptimized]);
 
   return (
     <Canvas
@@ -176,16 +179,17 @@ export default function Scene({
           rotateSpeed={rotateSpeed}
           targetAngle={targetAngle}
           userInteracting={userInteracting}
-          floatBase={0.12}
-          position={[0, 0.12, 0]}
+          floatBase={isMobileOptimized ? 0.08 : 0.12}
+          position={[0, isMobileOptimized ? 0.08 : 0.12, 0]}
+          scaleMultiplier={isMobileOptimized ? 1.25 : 1.0}
         />
       </Suspense>
 
       {/* Ground Contact Shadow */}
       <ContactShadows
-        position={[0, -1.02, 0]}
+        position={[0, isMobileOptimized ? -1.1 : -1.02, 0]}
         opacity={lighting.shadowOpacity}
-        scale={7.8}
+        scale={isMobileOptimized ? 8.6 : 7.8}
         blur={2.2}
         far={3.0}
         resolution={shadowRes}
@@ -197,7 +201,7 @@ export default function Scene({
         makeDefault
         enableZoom={false}
         enablePan={false}
-        target={[0, 0.12, 0]}
+        target={[0, isMobileOptimized ? 0.08 : 0.12, 0]}
         minPolarAngle={Math.PI / 2.3}
         maxPolarAngle={Math.PI / 1.8}
         enableDamping

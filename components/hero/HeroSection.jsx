@@ -456,11 +456,12 @@ export default function HeroSection() {
           </div>
 
           {/* Mobile Dedicated 3D Interactive Canvas (Cleanly framed, no overlapping text/cards) */}
-          <div className="relative w-full h-[38vh] min-h-[250px] max-h-[360px] my-auto cursor-grab active:cursor-grabbing">
+          <div className="relative w-full h-[44vh] min-h-[295px] max-h-[415px] my-auto cursor-grab active:cursor-grabbing">
             <Scene
               activeTheme={activeVariation.themeId}
               autoRotate={true}
               rotateSpeed={0.75}
+              isMobileView={true}
             />
             {/* Subtle 360 Drag Hint */}
             <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-black/40 px-2.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider text-white/70 backdrop-blur-sm">
