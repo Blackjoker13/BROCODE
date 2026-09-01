@@ -59,34 +59,56 @@ export function StorefrontProvider({ children, initialData }) {
   // Cart state in LocalStorage
   const [cart, setCart] = useState([]);
 
-  // Client refresh handler (used after order placement or manual sync)
+  // Client refresh handler (used after admin edits, tab switch, or interval)
   const refreshData = useCallback(async () => {
     try {
-      const res = await fetch("/api/storefront/data");
+      const res = await fetch(`/api/storefront/data?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Pragma": "no-cache", "Cache-Control": "no-cache" },
+      });
       const d = await res.json();
-      if (d.success) {
+      if (d && d.success && d.categories && d.categories.length > 0) {
         setData(d);
       }
     } catch (e) {
-      console.error("Failed to refresh storefront data:", e);
+      console.warn("Real-time storefront sync notice:", e.message);
     }
   }, []);
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && initialData.categories && initialData.categories.length > 0) {
       setData(initialData);
     }
   }, [initialData]);
 
   useEffect(() => {
-    // Always refresh real-time data in background so admin edits appear instantly
+    // Initial fresh sync on mount
     refreshData();
+
+    // Auto-refresh when user focuses the tab or switches back from Admin panel
+    const handleFocus = () => {
+      if (document.visibilityState === "visible") {
+        refreshData();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    // Silent background poll every 8 seconds
+    const interval = setInterval(refreshData, 8000);
 
     // Load persisted cart from localStorage
     try {
       const saved = localStorage.getItem("brocode_cart");
       if (saved) setCart(JSON.parse(saved));
     } catch (e) {}
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+      clearInterval(interval);
+    };
   }, [refreshData]);
 
   const saveCart = (newCart) => {
