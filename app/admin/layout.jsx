@@ -27,10 +27,12 @@ import {
   Compass,
   Camera,
   Music,
+  Activity,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
+  { label: "System Health", href: "/admin/health", icon: Activity, badge: "DIAGNOSTICS" },
   { label: "Live Customer Preview", href: "/admin/preview", icon: Eye, badge: "VERIFY" },
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Categories", href: "/admin/categories", icon: FolderTree },
