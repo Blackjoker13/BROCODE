@@ -5,45 +5,23 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import { usePerformance } from "@/lib/performance/PerformanceContext";
-
-const DRACO_PATH = "/draco/gltf/";
-
-export const MODEL_CONFIGS = {
-  noir: {
-    url: "/models/tshirt_param_noir.glb",
-    isAnimated: false,
-    scale: 2.05,
-    yOffset: 0.12,
-  },
-  cyber: {
-    url: "/models/tshirt_cyber_kinetic.glb",
-    isAnimated: true,
-    scale: 2.15,
-    yOffset: 0.05,
-  },
-  ragnarok: {
-    url: "/models/tshirt_gothic_ragnarok.glb",
-    isAnimated: true,
-    scale: 2.15,
-    yOffset: 0.05,
-  },
-};
+import { getModel, MODEL_REGISTRY } from "@/lib/assets/assetService";
 
 // Cached, pooled single model with persistent GPU buffers
 function ModelInstance({
   modelUrl,
+  dracoPath,
   isAnimated,
   targetHeight,
-  visible,
   tier,
   isLowPower,
   gl,
 }) {
   const group = useRef();
-  const { scene, animations } = useGLTF(modelUrl, DRACO_PATH);
+  const { scene, animations } = useGLTF(modelUrl, dracoPath);
   const { actions } = useAnimations(animations, group);
 
-  // Play / pause animations based on active visibility (Zero CPU waste when hidden)
+  // Play / pause animations (Zero CPU waste when tab hidden or unmounted)
   useEffect(() => {
     if (!isAnimated || !actions) return;
     const actionNames = Object.keys(actions);
@@ -52,13 +30,13 @@ function ModelInstance({
     const action = actions[actionNames[0]];
     if (!action) return;
 
-    if (visible) {
-      action.reset().fadeIn(0.2).play();
-      action.setEffectiveTimeScale(0.85);
-    } else {
-      action.fadeOut(0.2);
-    }
-  }, [actions, isAnimated, visible]);
+    action.reset().fadeIn(0.25).play();
+    action.setEffectiveTimeScale(0.85);
+
+    return () => {
+      action?.fadeOut(0.2);
+    };
+  }, [actions, isAnimated]);
 
   // Center and normalize once per model load
   const modelObject = useMemo(() => {
@@ -104,7 +82,7 @@ function ModelInstance({
   }, [scene, targetHeight, gl, tier, isLowPower]);
 
   return (
-    <group ref={group} visible={visible}>
+    <group ref={group}>
       <primitive object={modelObject} />
     </group>
   );
@@ -122,7 +100,7 @@ export default function TshirtModel({
   const gl = useThree((state) => state.gl);
   const { tier, isLowPower } = usePerformance();
 
-  const config = MODEL_CONFIGS[activeTheme] || MODEL_CONFIGS.noir;
+  const modelInfo = useMemo(() => getModel(activeTheme), [activeTheme]);
 
   const targetAngleRef = useRef(targetAngle);
   const isTransitioningAngle = useRef(false);
@@ -159,39 +137,17 @@ export default function TshirtModel({
 
     // Floating animation
     const t = state.clock.elapsedTime;
-    outerGroup.current.position.y = (config.yOffset || 0.1) + Math.sin(t * 1.5) * 0.03;
+    outerGroup.current.position.y = (modelInfo.yOffset || 0.1) + Math.sin(t * 1.5) * 0.03;
   });
 
   return (
     <group ref={outerGroup} {...props}>
-      {/* 1. NOIR MODEL */}
       <ModelInstance
-        modelUrl={MODEL_CONFIGS.noir.url}
-        isAnimated={MODEL_CONFIGS.noir.isAnimated}
-        targetHeight={MODEL_CONFIGS.noir.scale}
-        visible={activeTheme === "noir"}
-        tier={tier}
-        isLowPower={isLowPower}
-        gl={gl}
-      />
-
-      {/* 2. CYBER MODEL */}
-      <ModelInstance
-        modelUrl={MODEL_CONFIGS.cyber.url}
-        isAnimated={MODEL_CONFIGS.cyber.isAnimated}
-        targetHeight={MODEL_CONFIGS.cyber.scale}
-        visible={activeTheme === "cyber"}
-        tier={tier}
-        isLowPower={isLowPower}
-        gl={gl}
-      />
-
-      {/* 3. RAGNAROK MODEL */}
-      <ModelInstance
-        modelUrl={MODEL_CONFIGS.ragnarok.url}
-        isAnimated={MODEL_CONFIGS.ragnarok.isAnimated}
-        targetHeight={MODEL_CONFIGS.ragnarok.scale}
-        visible={activeTheme === "ragnarok"}
+        key={modelInfo.id}
+        modelUrl={modelInfo.url}
+        dracoPath={modelInfo.dracoPath}
+        isAnimated={modelInfo.isAnimated}
+        targetHeight={modelInfo.scale}
         tier={tier}
         isLowPower={isLowPower}
         gl={gl}
@@ -200,19 +156,22 @@ export default function TshirtModel({
   );
 }
 
-// Prioritize primary active model preloading immediately
+// Preload the primary active model immediately
 if (typeof window !== "undefined") {
-  useGLTF.preload(MODEL_CONFIGS.noir.url, DRACO_PATH);
+  const initialModel = getModel("noir");
+  useGLTF.preload(initialModel.url, initialModel.dracoPath);
 
   // Defer secondary theme models until idle to ensure initial hero renders instantly (<1s)
   const deferSecondaryPreload = () => {
-    useGLTF.preload(MODEL_CONFIGS.cyber.url, DRACO_PATH);
-    useGLTF.preload(MODEL_CONFIGS.ragnarok.url, DRACO_PATH);
+    const cyberModel = getModel("cyber");
+    const ragnarokModel = getModel("ragnarok");
+    useGLTF.preload(cyberModel.url, cyberModel.dracoPath);
+    useGLTF.preload(ragnarokModel.url, ragnarokModel.dracoPath);
   };
 
   if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(deferSecondaryPreload, { timeout: 2500 });
+    window.requestIdleCallback(deferSecondaryPreload, { timeout: 3000 });
   } else {
-    setTimeout(deferSecondaryPreload, 2000);
+    setTimeout(deferSecondaryPreload, 3000);
   }
 }

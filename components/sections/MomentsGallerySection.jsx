@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { useMemo } from "react";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { useStorefront } from "@/lib/storefront/StorefrontContext";
 import { motion } from "framer-motion";
 import { WordReveal, MagneticElement } from "@/components/ui/KineticText";
@@ -80,11 +81,10 @@ export default function MomentsGallerySection() {
                   } border-2 border-black/15 bg-black p-1 shadow-lg transition-all duration-500 hover:scale-110 hover:border-[#EF0606]`}
                 >
                   <div className={`relative h-full w-full overflow-hidden ${idx % 2 === 0 ? "rounded-full" : "rounded-2xl"}`}>
-                    <Image
+                    <OptimizedImage
                       src={item.img}
                       alt="Brocode Moment"
                       fill
-                      unoptimized={item.img?.startsWith("/uploads/") || item.img?.startsWith("http")}
                       sizes="180px"
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-115"
                     />
@@ -130,11 +130,10 @@ export default function MomentsGallerySection() {
                   className="group relative aspect-square overflow-hidden rounded-2xl border border-white/15 bg-[#090C10] p-1.5 transition-all hover:border-[#CCFF00] hover:shadow-[0_0_25px_rgba(204,255,0,0.25)]"
                 >
                   <div className="relative h-full w-full overflow-hidden rounded-xl">
-                    <Image
+                    <OptimizedImage
                       src={item.img}
                       alt="Cyber Moment"
                       fill
-                      unoptimized={item.img?.startsWith("/uploads/") || item.img?.startsWith("http")}
                       sizes="220px"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -186,11 +185,10 @@ export default function MomentsGallerySection() {
                   className="group relative aspect-[4/5] overflow-hidden rounded-t-[50px] rounded-b-2xl border-2 border-[#F59E0B]/40 bg-[#161010] p-1.5 transition-all hover:border-[#F59E0B] hover:-translate-y-2 shadow-xl"
                 >
                   <div className="relative h-full w-full overflow-hidden rounded-t-[42px] rounded-b-xl">
-                    <Image
+                    <OptimizedImage
                       src={item.img}
                       alt="Valhalla Chronicle"
                       fill
-                      unoptimized={item.img?.startsWith("/uploads/") || item.img?.startsWith("http")}
                       sizes="220px"
                       className="object-cover transition-transform duration-700 group-hover:scale-115"
                     />

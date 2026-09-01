@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { useStorefront } from "@/lib/storefront/StorefrontContext";
 import { motion } from "framer-motion";
 import { WordReveal } from "@/components/ui/KineticText";
@@ -36,12 +36,11 @@ export default function AboutSection() {
               <Tilt3DCard maxTilt={6} scale={1.02}>
                 <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-black/15 bg-black p-2 shadow-2xl transition-all duration-700 hover:border-[#EF0606]">
                   <div className="relative h-full w-full overflow-hidden rounded-2xl">
-                    <Image
+                    <OptimizedImage
                       src={rackImage}
                       alt={rackLabel}
                       fill
                       priority
-                      unoptimized={rackImage.startsWith("/uploads/") || rackImage.startsWith("http")}
                       sizes="(max-width: 768px) 100vw, 50vw"
                       className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                     />
@@ -71,11 +70,10 @@ export default function AboutSection() {
                 <Tilt3DCard maxTilt={12} scale={1.05}>
                   <div className="group aspect-square w-48 overflow-hidden rounded-3xl border-2 border-black/15 bg-black p-1.5 shadow-2xl transition-all sm:w-56 hover:border-[#EF0606]">
                     <div className="relative h-full w-full overflow-hidden rounded-2xl">
-                      <Image
+                      <OptimizedImage
                         src={foundersImage}
                         alt={foundersLabel}
                         fill
-                        unoptimized={foundersImage.startsWith("/uploads/") || foundersImage.startsWith("http")}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     </div>
@@ -119,11 +117,10 @@ export default function AboutSection() {
               {/* Col 2: Founders Cyber HUD Badge */}
               <div className="flex flex-col items-center text-center">
                 <div className="relative aspect-square w-48 overflow-hidden rounded-2xl border-2 border-[#CCFF00] p-1 shadow-[0_0_25px_rgba(204,255,0,0.3)]">
-                  <Image
+                  <OptimizedImage
                     src={foundersImage}
                     alt={foundersLabel}
                     fill
-                    unoptimized={foundersImage.startsWith("/uploads/") || foundersImage.startsWith("http")}
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#080B10]/80 via-transparent to-transparent" />
@@ -167,11 +164,10 @@ export default function AboutSection() {
             <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-12 items-center">
               <div className="lg:col-span-5 relative aspect-square overflow-hidden rounded-t-[60px] rounded-b-2xl border-2 border-[#F59E0B] p-2 shadow-2xl">
                 <div className="relative h-full w-full overflow-hidden rounded-t-[52px] rounded-b-xl">
-                  <Image
+                  <OptimizedImage
                     src={foundersImage}
                     alt={foundersLabel}
                     fill
-                    unoptimized={foundersImage.startsWith("/uploads/") || foundersImage.startsWith("http")}
                     className="object-cover"
                   />
                 </div>

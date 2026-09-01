@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "optimize-assets": "node scripts/optimize_assets.js",
+    "build": "node scripts/optimize_assets.js && prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
-    "compress-model": "gltf-pipeline -i brocode_Tshirt.glb -o public/tshirt.glb -d --draco.compressionLevel 10"
+    "compress-model": "node scripts/optimize_assets.js"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",

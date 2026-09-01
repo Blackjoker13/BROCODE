@@ -117,7 +117,7 @@ export default function BackgroundAudioPlayer() {
     <audio
       ref={audioRef}
       src={currentTrack?.url || "/12.webm"}
-      preload="auto"
+      preload="none"
       onEnded={handleTrackEnded}
       playsInline
       className="hidden pointer-events-none"

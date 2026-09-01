@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { useMemo } from "react";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { useStorefront } from "@/lib/storefront/StorefrontContext";
 import { SectionHeaderMotion } from "@/components/ui/KineticText";
 import { Tilt3DCard, StaggerContainer, StaggerItem } from "@/components/ui/MotionCard";
@@ -66,13 +67,12 @@ export default function CategoriesSection() {
                       {/* Circular Preview Container */}
                       <div className="relative mx-auto mt-7 aspect-square w-full max-w-[175px] overflow-hidden rounded-full border-[3px] border-black p-1 shadow-lg transition-all duration-300 group-hover:border-[#EF0606]">
                         <div className="relative h-full w-full overflow-hidden rounded-full">
-                          <Image
+                          <OptimizedImage
                             src={cat.image || "/images/pallet_rack.jpg"}
                             alt={cat.name}
                             width={180}
                             height={180}
                             priority={idx < 2}
-                            unoptimized={cat.image?.startsWith("/uploads/") || cat.image?.startsWith("http")}
                             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-115"
                           />
                         </div>
@@ -134,12 +134,11 @@ export default function CategoriesSection() {
                   </div>
 
                   <div className="relative my-6 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-[#CCFF00]/30">
-                    <Image
+                    <OptimizedImage
                       src={displayCategories[0].image || "/images/pallet_rack.jpg"}
                       alt={displayCategories[0].name}
                       fill
                       priority
-                      unoptimized={displayCategories[0].image?.startsWith("/uploads/") || displayCategories[0].image?.startsWith("http")}
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080B10] via-transparent to-transparent" />
@@ -166,7 +165,7 @@ export default function CategoriesSection() {
 
                   <div className="my-3 flex items-center gap-4">
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/20">
-                      <Image
+                      <OptimizedImage
                         src={cat.image || "/images/pallet_rack.jpg"}
                         alt={cat.name}
                         fill
@@ -217,12 +216,11 @@ export default function CategoriesSection() {
                   {/* Arched Heraldic Portal Image */}
                   <div className="relative mx-auto mt-2 aspect-[4/5] w-full overflow-hidden rounded-t-[60px] rounded-b-2xl border border-[#F59E0B]/30 p-1">
                     <div className="relative h-full w-full overflow-hidden rounded-t-[54px] rounded-b-xl">
-                      <Image
+                      <OptimizedImage
                         src={cat.image || "/images/pallet_rack.jpg"}
                         alt={cat.name}
                         fill
                         priority={idx < 2}
-                        unoptimized={cat.image?.startsWith("/uploads/") || cat.image?.startsWith("http")}
                         className="object-cover transition-transform duration-700 group-hover:scale-115"
                       />
                     </div>

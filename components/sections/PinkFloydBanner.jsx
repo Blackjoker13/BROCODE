@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { useStorefront } from "@/lib/storefront/StorefrontContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { WordReveal, MagneticElement, KineticRibbon } from "@/components/ui/KineticText";
@@ -97,15 +97,11 @@ export default function PinkFloydBanner() {
                 transition={{ duration: 0.7, ease: "easeOut" }}
                 className="absolute inset-0 h-full w-full"
               >
-                <Image
+                <OptimizedImage
                   src={currentBanner.image || "/images/pink_floyd_banner.jpg"}
                   alt={currentBanner.title}
                   fill
                   priority={currentIndex === 0}
-                  unoptimized={
-                    currentBanner.image?.startsWith("/uploads/") ||
-                    currentBanner.image?.startsWith("http")
-                  }
                   sizes="100vw"
                   className="h-full w-full object-cover object-center brightness-90"
                 />
@@ -285,14 +281,10 @@ export default function PinkFloydBanner() {
                     transition={{ duration: 0.5 }}
                     className="absolute inset-0 h-full w-full"
                   >
-                    <Image
+                    <OptimizedImage
                       src={currentBanner.image || "/images/pink_floyd_banner.jpg"}
                       alt={currentBanner.title}
                       fill
-                      unoptimized={
-                        currentBanner.image?.startsWith("/uploads/") ||
-                        currentBanner.image?.startsWith("http")
-                      }
                       className="object-cover"
                     />
                   </motion.div>
@@ -348,14 +340,10 @@ export default function PinkFloydBanner() {
                   transition={{ duration: 0.7 }}
                   className="absolute inset-0 h-full w-full"
                 >
-                  <Image
+                  <OptimizedImage
                     src={currentBanner.image || "/images/pink_floyd_banner.jpg"}
                     alt={currentBanner.title}
                     fill
-                    unoptimized={
-                      currentBanner.image?.startsWith("/uploads/") ||
-                      currentBanner.image?.startsWith("http")
-                    }
                     className="object-cover brightness-75"
                   />
                 </motion.div>
