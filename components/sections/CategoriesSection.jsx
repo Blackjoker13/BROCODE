@@ -41,7 +41,7 @@ export default function CategoriesSection() {
 
             <StaggerContainer
               stagger={0.07}
-              className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 md:gap-6"
+              className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 md:gap-6 justify-center"
             >
               {displayCategories.map((cat, idx) => (
                 <StaggerItem key={cat.id || idx}>
@@ -206,7 +206,7 @@ export default function CategoriesSection() {
             />
 
             {/* Medieval Arched Stone Portals */}
-            <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-5">
+            <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 justify-center">
               {displayCategories.map((cat, idx) => (
                 <a
                   key={cat.id || idx}
