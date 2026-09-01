@@ -62,7 +62,14 @@ export function StorefrontProvider({ children, initialData }) {
   // Client refresh handler (used after admin edits, tab switch, or interval)
   const refreshData = useCallback(async () => {
     try {
-      const res = await fetch(`/api/storefront/data?t=${Date.now()}`, {
+      const isPreview =
+        typeof window !== "undefined" &&
+        (window.location.search.includes("preview=draft") ||
+          window.location.search.includes("preview=true") ||
+          window.self !== window.top);
+
+      const previewQuery = isPreview ? "&preview=draft" : "";
+      const res = await fetch(`/api/storefront/data?t=${Date.now()}${previewQuery}`, {
         cache: "no-store",
         headers: { "Pragma": "no-cache", "Cache-Control": "no-cache" },
       });

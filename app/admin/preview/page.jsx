@@ -35,6 +35,7 @@ export default function AdminCustomerPreviewPage() {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(Date.now());
   const [draftState, setDraftState] = useState(null);
   const [versions, setVersions] = useState([]);
 
@@ -54,6 +55,7 @@ export default function AdminCustomerPreviewPage() {
   const fetchPreviewState = useCallback(async () => {
     try {
       setRefreshing(true);
+      setRefreshKey(Date.now());
       const [prevRes, verRes] = await Promise.all([
         fetch("/api/admin/preview"),
         fetch("/api/admin/versions"),
@@ -351,7 +353,12 @@ export default function AdminCustomerPreviewPage() {
             className={`relative flex-1 overflow-hidden transition-all duration-300 bg-black ${currentDevice.frameClass}`}
           >
             <iframe
-              src={activePage}
+              src={
+                activePage.includes("?")
+                  ? `${activePage}&preview=draft&_t=${refreshKey}`
+                  : `${activePage}?preview=draft&_t=${refreshKey}`
+              }
+              key={`${activePage}-${refreshKey}`}
               title="Customer Live Preview"
               className="h-full w-full border-0 bg-black"
               style={{ minHeight: "calc(100vh - 120px)" }}
