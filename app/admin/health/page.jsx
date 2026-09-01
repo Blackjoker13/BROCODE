@@ -218,7 +218,7 @@ export default function AdminHealthPage() {
           Execute direct real-time database CRUD, read, and customer synchronization tests.
         </p>
 
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <button
             onClick={() => runTest("test_db_read", "Database Read Test")}
             disabled={testingAction !== null}
@@ -244,6 +244,45 @@ export default function AdminHealthPage() {
           >
             <Globe className="h-4 w-4" />
             3. TEST CUSTOMER SYNC
+          </button>
+
+          <button
+            onClick={async () => {
+              setTestingAction("migrate");
+              try {
+                const res = await fetch("/api/admin/migrate", { method: "POST" });
+                const data = await res.json();
+                setTestResults((prev) => [
+                  {
+                    id: Date.now(),
+                    title: "Real Data Migration (SQLite -> PostgreSQL)",
+                    time: new Date().toLocaleTimeString(),
+                    success: data.success,
+                    message: data.message || data.error,
+                  },
+                  ...prev,
+                ]);
+              } catch (err) {
+                setTestResults((prev) => [
+                  {
+                    id: Date.now(),
+                    title: "Migration Execution Error",
+                    time: new Date().toLocaleTimeString(),
+                    success: false,
+                    message: err.message,
+                  },
+                  ...prev,
+                ]);
+              } finally {
+                setTestingAction(null);
+                fetchHealth();
+              }
+            }}
+            disabled={testingAction !== null}
+            className="flex items-center justify-center gap-2 rounded-2xl border border-[#CCFF00]/40 bg-[#CCFF00]/10 p-4 font-mono text-xs font-black uppercase text-[#CCFF00] transition-all hover:border-[#CCFF00] hover:bg-[#CCFF00]/20 disabled:opacity-50 shadow-[0_0_20px_rgba(204,255,0,0.15)]"
+          >
+            <Layers className="h-4 w-4" />
+            4. MIGRATE REAL DATA
           </button>
         </div>
 
