@@ -3,6 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   compress: true,
   transpilePackages: ["three", "@react-three/fiber", "@react-three/drei"],
+  // Prevent Turbopack from bundling server-only packages (Prisma, fs-dependent modules)
+  serverExternalPackages: ["@prisma/client", "prisma"],
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000,
