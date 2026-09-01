@@ -121,11 +121,18 @@ export default function Scene({
 
   const shouldRender = isHeroVisible && isTabVisible;
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const cameraConfig = useMemo(() => {
+    return isMobile
+      ? { position: [0, 0.08, 4.9], fov: 34, near: 0.1, far: 30 }
+      : { position: [0, 0.12, 4.5], fov: 32, near: 0.1, far: 30 };
+  }, [isMobile]);
+
   return (
     <Canvas
       dpr={dpr}
       frameloop={shouldRender ? "always" : "never"}
-      camera={{ position: [0, 0.12, 4.5], fov: 32, near: 0.1, far: 30 }}
+      camera={cameraConfig}
       gl={{
         antialias: false,
         alpha: true,

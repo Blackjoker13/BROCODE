@@ -177,8 +177,8 @@ export default function Footer() {
       </div>
 
       {/* Very Bottom Copyright Bar */}
-      <div className="border-t border-black/20 bg-[#000000] px-6 py-4 font-geometric text-[10px] font-bold uppercase tracking-widest text-[#EFEEE8]/80">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
+      <div className="border-t border-black/20 bg-[#000000] px-4 sm:px-6 py-4 font-geometric text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-[#EFEEE8]/80">
+        <div className="mx-auto flex max-w-7xl flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 text-center sm:text-left">
           <span 
             onClick={() => {
               if (!window._adminClickCount) window._adminClickCount = 0;
@@ -194,7 +194,7 @@ export default function Footer() {
           >
             © 2025 BROCODE. ALL RIGHTS RESERVED
           </span>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <a href="#terms" className="hover:text-white transition-colors">
               TERMS & POLICIES
             </a>

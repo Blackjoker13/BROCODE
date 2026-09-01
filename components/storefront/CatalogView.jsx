@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import Image from "next/image";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useStorefront } from "@/lib/storefront/StorefrontContext";
@@ -497,7 +497,7 @@ export default function CatalogView() {
                     {/* Product Image */}
                     <div className="relative my-4 aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-[#080B10] p-1">
                       <div className="relative h-full w-full overflow-hidden rounded-xl">
-                        <Image
+                        <OptimizedImage
                           src={imgs[0] || "/images/sabaton_tee.jpg"}
                           alt={prod.title || "Product"}
                           fill

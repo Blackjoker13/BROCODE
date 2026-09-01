@@ -48,14 +48,14 @@ export default function CategoriesSection() {
                   <Tilt3DCard maxTilt={8} scale={1.02}>
                     <a
                       href={getCategoryHref(cat.name || cat.id)}
-                      className="glass-theme-card group relative flex flex-col justify-between overflow-hidden rounded-3xl p-5 border border-black/10 block cursor-pointer transition-transform hover:-translate-y-1"
+                      className="glass-theme-card group relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-black/10 block cursor-pointer transition-transform hover:-translate-y-1"
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-didone text-2xl sm:text-3xl font-black leading-none tracking-tight text-black transition-colors group-hover:text-[#EF0606]">
+                          <h3 className="font-didone text-lg sm:text-2xl md:text-3xl font-black leading-tight tracking-tight text-black transition-colors group-hover:text-[#EF0606] line-clamp-1">
                             {cat.name}
                           </h3>
-                          <p className="mt-1.5 font-geometric text-[9px] font-black uppercase tracking-widest text-neutral-500">
+                          <p className="mt-0.5 sm:mt-1.5 font-geometric text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-neutral-500">
                             {cat.itemCount || "100+"} ITEMS
                           </p>
                         </div>
@@ -65,7 +65,7 @@ export default function CategoriesSection() {
                       </div>
 
                       {/* Circular Preview Container */}
-                      <div className="relative mx-auto mt-7 aspect-square w-full max-w-[175px] overflow-hidden rounded-full border-[3px] border-black p-1 shadow-lg transition-all duration-300 group-hover:border-[#EF0606]">
+                      <div className="relative mx-auto mt-3 sm:mt-7 aspect-square w-full max-w-[120px] sm:max-w-[150px] md:max-w-[175px] overflow-hidden rounded-full border-2 sm:border-[3px] border-black p-0.5 sm:p-1 shadow-lg transition-all duration-300 group-hover:border-[#EF0606]">
                         <div className="relative h-full w-full overflow-hidden rounded-full">
                           <OptimizedImage
                             src={cat.image || "/images/pallet_rack.jpg"}
@@ -206,12 +206,12 @@ export default function CategoriesSection() {
             />
 
             {/* Medieval Arched Stone Portals */}
-            <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-5">
+            <div className="mt-8 sm:mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-5">
               {displayCategories.map((cat, idx) => (
                 <a
                   key={cat.id || idx}
                   href={getCategoryHref(cat.name || cat.id)}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-t-[70px] rounded-b-3xl border-2 border-[#F59E0B]/40 bg-[#120D0D]/95 p-4 text-center backdrop-blur-2xl shadow-[0_0_30px_rgba(245,158,11,0.15)] transition-all duration-500 hover:border-[#F59E0B] hover:-translate-y-2 block cursor-pointer"
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-t-[40px] sm:rounded-t-[70px] rounded-b-2xl sm:rounded-b-3xl border-2 border-[#F59E0B]/40 bg-[#120D0D]/95 p-2.5 sm:p-4 text-center backdrop-blur-2xl shadow-[0_0_30px_rgba(245,158,11,0.15)] transition-all duration-500 hover:border-[#F59E0B] hover:-translate-y-2 block cursor-pointer"
                 >
                   {/* Arched Heraldic Portal Image */}
                   <div className="relative mx-auto mt-2 aspect-[4/5] w-full overflow-hidden rounded-t-[60px] rounded-b-2xl border border-[#F59E0B]/30 p-1">
