@@ -24,7 +24,7 @@ export default function CategoriesSection() {
   };
 
   return (
-    <section id="categories" className="content-auto relative w-full bg-transparent px-5 py-20 md:px-10 lg:px-14 select-none">
+    <section id="categories" className="content-auto relative w-full bg-transparent px-4 sm:px-8 md:px-12 py-16 sm:py-24 select-none">
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* =========================================================================
             1. THEME 01: NOIR ACID (CIRCULAR MINIMALIST LOOKBOOK PODS)
@@ -41,45 +41,54 @@ export default function CategoriesSection() {
 
             <StaggerContainer
               stagger={0.07}
-              className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 md:gap-6 justify-center"
+              className="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-3.5 sm:gap-6 justify-center"
             >
               {displayCategories.map((cat, idx) => (
                 <StaggerItem key={cat.id || idx}>
-                  <Tilt3DCard maxTilt={8} scale={1.02}>
+                  <Tilt3DCard maxTilt={6} scale={1.02}>
                     <a
                       href={getCategoryHref(cat.name || cat.id)}
-                      className="glass-theme-card group relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-black/10 block cursor-pointer transition-transform hover:-translate-y-1"
+                      className="glass-theme-card group relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-black/10 block cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-black/25"
                     >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-didone text-lg sm:text-2xl md:text-3xl font-black leading-tight tracking-tight text-black transition-colors group-hover:text-[#EF0606] line-clamp-1">
+                      {/* Top Header info */}
+                      <div className="flex items-start justify-between gap-1 w-full">
+                        <div className="min-w-0 flex-1">
+                          <h3
+                            className="font-didone font-black uppercase tracking-tight text-black transition-colors group-hover:text-[#EF0606] truncate"
+                            style={{
+                              fontSize:
+                                cat.name && cat.name.length > 8
+                                  ? "clamp(13px, 1.2vw, 17px)"
+                                  : "clamp(16px, 1.6vw, 22px)",
+                            }}
+                            title={cat.name}
+                          >
                             {cat.name}
                           </h3>
-                          <p className="mt-0.5 sm:mt-1.5 font-geometric text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-neutral-500">
+                          <p className="mt-0.5 sm:mt-1 font-geometric text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-neutral-500 truncate">
                             {cat.itemCount || "100+"} ITEMS
                           </p>
                         </div>
-                        <span className="font-geometric text-xs font-bold text-black/30 group-hover:text-[#EF0606]">
+                        <span className="font-geometric text-xs font-bold text-black/30 group-hover:text-[#EF0606] shrink-0 mt-0.5">
                           ✦
                         </span>
                       </div>
 
                       {/* Circular Preview Container */}
-                      <div className="relative mx-auto mt-3 sm:mt-7 aspect-square w-full max-w-[120px] sm:max-w-[150px] md:max-w-[175px] overflow-hidden rounded-full border-2 sm:border-[3px] border-black p-0.5 sm:p-1 shadow-lg transition-all duration-300 group-hover:border-[#EF0606]">
+                      <div className="relative mx-auto mt-4 sm:mt-6 aspect-square w-full max-w-[125px] sm:max-w-[150px] md:max-w-[165px] overflow-hidden rounded-full border-2 sm:border-[3px] border-black p-0.5 sm:p-1 shadow-md transition-all duration-300 group-hover:border-[#EF0606] group-hover:shadow-[0_0_20px_rgba(239,6,6,0.25)]">
                         <div className="relative h-full w-full overflow-hidden rounded-full">
                           <OptimizedImage
                             src={cat.image || "/images/pallet_rack.jpg"}
                             alt={cat.name}
-                            width={180}
-                            height={180}
+                            fill
                             priority={idx < 2}
-                            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-115"
+                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-115"
                           />
                         </div>
 
                         {cat.actionText && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] transition-opacity group-hover:bg-black/20">
-                            <span className="rounded-xl bg-black px-3.5 py-1.5 font-geometric text-[9px] font-black uppercase tracking-wider text-white shadow-lg group-hover:bg-[#EF0606]">
+                            <span className="rounded-xl bg-black px-3 py-1 font-geometric text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-white shadow-lg group-hover:bg-[#EF0606]">
                               {cat.actionText}
                             </span>
                           </div>
@@ -125,7 +134,7 @@ export default function CategoriesSection() {
                       <Zap className="h-3 w-3 animate-pulse" />
                       PRIMARY HARDWARE CAPSULE
                     </span>
-                    <h3 className="mt-3 font-mono text-3xl sm:text-4xl font-black uppercase text-[#CCFF00] tracking-tight">
+                    <h3 className="mt-3 font-mono text-2xl sm:text-4xl font-black uppercase text-[#CCFF00] tracking-tight truncate">
                       {displayCategories[0].name} // CORE
                     </h3>
                     <p className="mt-1 font-mono text-xs text-neutral-400">
@@ -151,7 +160,7 @@ export default function CategoriesSection() {
                 </div>
               </a>
 
-              {/* 4 Modular Compact Bento Capsules */}
+              {/* Modular Compact Bento Capsules */}
               {displayCategories.slice(1).map((cat, idx) => (
                 <a
                   key={cat.id || idx}
@@ -172,8 +181,8 @@ export default function CategoriesSection() {
                         className="object-cover transition-transform duration-500 group-hover:scale-115"
                       />
                     </div>
-                    <div>
-                      <h4 className="font-mono text-xl font-black uppercase text-white group-hover:text-[#CCFF00]">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-mono text-lg sm:text-xl font-black uppercase text-white group-hover:text-[#CCFF00] truncate">
                         {cat.name}
                       </h4>
                       <span className="font-mono text-[10px] text-neutral-400">
@@ -231,10 +240,19 @@ export default function CategoriesSection() {
                   </div>
 
                   <div className="mt-4 pb-2">
-                    <h3 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wider text-[#FEF3C7] transition-colors group-hover:text-[#F59E0B]">
+                    <h3
+                      className="font-heading font-black uppercase tracking-wider text-[#FEF3C7] transition-colors group-hover:text-[#F59E0B] truncate"
+                      style={{
+                        fontSize:
+                          cat.name && cat.name.length > 8
+                            ? "clamp(13px, 1.2vw, 17px)"
+                            : "clamp(16px, 1.5vw, 22px)",
+                      }}
+                      title={cat.name}
+                    >
                       {cat.name}
                     </h3>
-                    <p className="mt-1 font-heading text-[10px] font-bold uppercase tracking-widest text-[#F59E0B]/80">
+                    <p className="mt-1 font-heading text-[10px] font-bold uppercase tracking-widest text-[#F59E0B]/80 truncate">
                       {cat.itemCount || "100+"} SACRED RELICS
                     </p>
                   </div>
