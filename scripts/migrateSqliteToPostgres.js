@@ -414,18 +414,20 @@ async function migrate() {
     await prisma.publicationVersion.upsert({
       where: { id: "pub-v1-baseline" },
       update: {
-        versionNumber: "v1.0",
-        releaseTitle: "Live Production Release — Real SQLite Migration",
+        versionNumber: 1,
+        versionTag: "v1.0",
+        title: "Live Production Release — Real SQLite Migration",
         status: "PUBLISHED",
-        snapshotJson: JSON.stringify(snapshot),
+        snapshot: JSON.stringify(snapshot),
         publishedAt: new Date(),
       },
       create: {
         id: "pub-v1-baseline",
-        versionNumber: "v1.0",
-        releaseTitle: "Live Production Release — Real SQLite Migration",
+        versionNumber: 1,
+        versionTag: "v1.0",
+        title: "Live Production Release — Real SQLite Migration",
         status: "PUBLISHED",
-        snapshotJson: JSON.stringify(snapshot),
+        snapshot: JSON.stringify(snapshot),
         publishedAt: new Date(),
       },
     });

@@ -23,7 +23,7 @@ export async function GET() {
       db.publicationVersion.findFirst({
         where: { status: "PUBLISHED" },
         orderBy: { versionNumber: "desc" },
-        select: { id: true, versionNumber: true, releaseTitle: true, publishedAt: true },
+        select: { id: true, versionNumber: true, versionTag: true, title: true, publishedAt: true },
       }),
     ]);
 
