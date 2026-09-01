@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
